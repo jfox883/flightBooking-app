@@ -14,14 +14,31 @@ const MainNavigator = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator 
-                screenOptions={{headerShown: false}}
                 initialRouteName={'Loading'}
             >
-                <Stack.Screen name='Loading' component={Loading}/>
-                <Stack.Screen name='Auth' component={Auth}/>
-                <Stack.Screen name='Home' component={Home}/>
-                <Stack.Screen name='Results' component={Results}/>
-                <Stack.Screen name='Profile' component={Profile}/>
+                <Stack.Screen 
+                    name='Loading' 
+                    component={Loading} 
+                    options={{headerShown: false}}
+                />
+                <Stack.Screen 
+                    name='Auth' 
+                    component={Auth} 
+                    options={{headerShown: false}}
+                />
+                <Stack.Screen 
+                    name='Home' 
+                    component={Home}
+                    options={{title: 'Search your next flight'}}
+                />
+                <Stack.Screen 
+                    name='Results' 
+                    component={Results}
+                />
+                <Stack.Screen 
+                    name='Profile' 
+                    component={Profile}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     )
