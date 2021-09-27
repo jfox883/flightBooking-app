@@ -1,6 +1,6 @@
 import React from 'react'
-import { Dimensions } from "react-native";
-import { NativeBaseProvider, Box, Center, Avatar, VStack, HStack, Button } from "native-base";
+import { Dimensions, Pressable } from "react-native";
+import { NativeBaseProvider, Box, Center, Avatar, VStack, HStack, Button, Text } from "native-base";
 
 import { getItem } from "../utils/SecureStorage";
 
@@ -8,24 +8,65 @@ import SearchInput from "../components/SearchInput";
 import DatePicker from '../components/DatePicker';
 import NumberPicker from '../components/NumberPicker';
 
-const { width, height } = Dimensions.get('window')
+const { width } = Dimensions.get('window')
+
+const FORM_UPDATE = 'FORM_UPDATE'
+const FORM_RESET = 'FORM_RESET'
+
+const INITIAL_STATE = {
+    inputValues:{
+        originPlace: '',
+        destinationPlace: '',
+        depart: '',
+        return: '',
+        adults: 0,
+        children: 0,
+    },
+    inputValidities: {
+        originPlace: false,
+        destinationPlace: false,
+        depart: false,
+        return: true,
+        adults: false,
+        children: true,
+    },
+    formIsValid: false,
+}
+
+const formReducer = (state, action) => {
+    switch(action.type) {
+        default:
+            return state
+        case FORM_UPDATE:
+            const updatedValues = {
+                ...state.inputValues,
+                [action.input]: action.value,
+            }
+            
+            const updatedValidities = {
+                ...state.inputValidities,
+                [action.input]: action.isValid,
+            }
+    
+            let updatedFormIsValid = true
+            for(const key in updatedValidities) {
+                updatedFormIsValid = updatedFormIsValid && updatedValidities[key]
+            }
+    
+            return {
+                formIsValid: updatedFormIsValid,
+                inputValidities: updatedValidities,
+                inputValues: updatedValues
+            }
+        case FORM_RESET:
+            return INITIAL_STATE
+    }
+}
 
 const Home = ({navigation}) => {
     const [userData, setUserData] = React.useState(null)
-
-    const [originPlace, setOriginPlace] = React.useState('')
-    const [destinationPlace, setDestinationPlace] = React.useState('')
-    const [outboundDate, setOutboundDate] = React.useState('')
-    const [inboundDate, setInboundDate] = React.useState('')
-    const [adults, setAdults] = React.useState(0)
-    const [children, setChildren] = React.useState(0)
-
-    const handleOriginDateChange = (value) => setOriginPlace(value)
-    const handleDestinationDateChange = (value) => setDestinationPlace(value)
-    const handleOutboundDateChange = (value) => setOutboundDate(value)
-    const handleInboundDateChange = (value) => setInboundDate(value)
-    const handleAdultsChange = (value) => setAdults(value)
-    const handleChildrenChange = (value) => setChildren(value)
+    const [formState, formDispatch] = React.useReducer(formReducer, INITIAL_STATE)
+    const [resetView, setResetView] = React.useState(0)
 
     React.useEffect(() => {
         (async () => {
@@ -33,6 +74,15 @@ const Home = ({navigation}) => {
             if(userResult) setUserData(JSON.parse(userResult))
         })()
     },[])
+
+    const handleValueChange = React.useCallback((inputIdentifier, inputValue, inputValidity) => {
+        formDispatch({
+            type: FORM_UPDATE,
+            input: inputIdentifier,
+            value: inputValue,
+            isValid: inputValidity
+        })
+    },[formDispatch])
 
     React.useLayoutEffect(() => {
         navigation.setOptions({
@@ -47,54 +97,79 @@ const Home = ({navigation}) => {
         })
     },[navigation, userData])
 
+    const handleSearchPress = () => {
+        console.log(formState)
+    }
+
+    const handleReset = () => setResetView(resetView => resetView+1)
+
     return (
-        <NativeBaseProvider>
-            <Center flex={1} safeArea>
+        <NativeBaseProvider key={resetView}>
+            <Center flex={1} bg='white' safeArea>
                 <VStack space={4} width={width*0.9}>
                     <SearchInput 
-                        label='Origen'
+                        id='originPlace'
+                        label='From where? '
                         iconName='home'
-                        value={originPlace}
-                        onChangeText={handleOriginDateChange}
+                        onInputChange={handleValueChange}
                         isRequired
                     />
                     <SearchInput 
-                        label='Destino'
+                        id='destinationPlace'
+                        label='To where? '
                         iconName='airplane'
-                        value={destinationPlace}
-                        onChangeText={handleDestinationDateChange}
+                        onInputChange={handleValueChange}
                         isRequired
                     />
                     <HStack space={1} width={width*0.45}>
                         <DatePicker 
-                            label='Ida'
-                            iconName='calendar'
-                            onChangeText={handleOutboundDateChange}
+                            id='depart'
+                            label='Depart Date '
+                            onInputChange={handleValueChange}
                             isRequired
                         />
-                        <DatePicker 
-                            label='Regreso'
-                            iconName='calendar'
-                            onChangeText={handleInboundDateChange}
+                        <DatePicker
+                            id='return'
+                            label='Return Date'
+                            onInputChange={handleValueChange}
                         />
                     </HStack>
-                    <HStack space={2} width={width*0.50} alignItems='center'>
-                        <Box width={width*0.45}>
+                    <HStack space={2} alignItems='center'>
+                        <VStack space={2} width={width*0.45}>
                             <NumberPicker 
-                                label='Adultos' 
-                                items={9} 
+                                id='adults'
+                                placeHolder='Adults'
+                                items={8} 
+                                onInputChange={handleValueChange}
                                 isRequired
-                                selectedValue={adults}
-                                onValueChange={handleAdultsChange}
                             />
                             <NumberPicker 
-                                label='Niños' 
-                                items={9} 
-                                selectedValue={children}
-                                onValueChange={handleChildrenChange}
+                                id='children'
+                                placeHolder='Children'
+                                onInputChange={handleValueChange}
+                                initialValid={true}
+                                items={8} 
                             />
-                        </Box>
-                        <Button top='4' width='90%' height={60}>Buscar</Button>
+                        </VStack>
+                        <VStack space={2} width={width*0.45} alignItems='center'>
+                            <Button 
+                                height={60}     
+                                width={width*0.40} 
+                                onPress={() => handleSearchPress()}
+                                isDisabled={!formState.formIsValid}
+                            >
+                                Search
+                            </Button>
+                            <Button 
+                                height={45}
+                                width={width*0.30}
+                                colorScheme='danger'
+                                onPress={handleReset}
+                            >
+                                Reset
+                            </Button>
+
+                        </VStack>
                     </HStack>
                 </VStack>
             </Center>

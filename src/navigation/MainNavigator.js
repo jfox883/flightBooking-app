@@ -14,7 +14,7 @@ const MainNavigator = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator 
-                initialRouteName={'Loading'}
+                initialRouteName='Loading'
             >
                 <Stack.Screen 
                     name='Loading' 

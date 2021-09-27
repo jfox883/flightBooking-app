@@ -1,12 +1,46 @@
 import React from 'react'
-import { FormControl, Input, Stack, Icon, IconButton, Button } from "native-base";
+import { FormControl, Input, Stack, Icon, Text, Button, HStack, Box, Spacer } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
+const PICKER_CHANGE = 'PICKER_CHANGE'
+const PICKER_TOUCHED = 'PICKER_TOUCHED'
+
+const pickerReducer = (state, action) => {
+    switch(action.type){
+        default:
+            return state
+        case PICKER_CHANGE:
+            return {
+                ...state,
+                value: action.value,
+                isValid: action.isValid,
+            }
+        case PICKER_TOUCHED:
+            return {
+                ...state,
+                touched: true
+            }
+    }
+}
+
 const DatePicker = (props) => {
     const [date, setDate] = React.useState(new Date())
-    const [inputDate, setInputDate] = React.useState('')
     const [showPicker, setShowPicker] = React.useState(false)
+
+    const [pickerState, pickerDispatch] = React.useReducer(pickerReducer, {
+        value: '',
+        isValid: props.initialValid || false,
+        touched: false
+    })
+
+    const { onInputChange = () => {}, id } = props
+
+    React.useEffect(() => {
+        if(pickerState.touched) {
+            onInputChange(id, pickerState.value, pickerState.isValid)
+        }
+    },[pickerState, onInputChange, id])
 
     const getStringDate = (date) => {
         let day = date.getDate()
@@ -18,30 +52,36 @@ const DatePicker = (props) => {
     }
 
     const handleDateChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date
         setShowPicker(!showPicker)
-        setInputDate(getStringDate(currentDate))
-        setDate(currentDate)
+        if(event.type === 'set') {
+            let isValid = true
+            let today = new Date()
+            const currentDate = selectedDate || date
+            const pickedDateString = getStringDate(currentDate)
+            if(currentDate <= today) isValid = false
+            setDate(currentDate)
+
+            pickerDispatch({
+                type: PICKER_CHANGE,
+                value: pickedDateString,
+                isValid 
+            })
+        }
+        pickerDispatch({ type: PICKER_TOUCHED })
     }
 
     return (
-        <FormControl isRequired={props.isRequired}>
+        <FormControl isRequired={props.isRequired} isInvalid={!pickerState.isValid && pickerState.touched && props.isRequired}>
             <Stack>
                 <FormControl.Label>{props.label}</FormControl.Label>
-                <Button variant='unstyled' onPress={() =>setShowPicker(!showPicker)}>
-                    <Input 
-                        InputLeftElement={
-                            <IconButton 
-                                variant='unstyled'
-                                icon={<Icon as={Ionicons} name={props.iconName} size='sm' ml={1} />}
-                                
-                            />
-                        }
-                        width='75%'
-                        value={inputDate}
-                        isDisabled
-                        {...props}
-                    />
+                <Button 
+                    variant='outline' 
+                    colorScheme='gray' 
+                    justifyContent='flex-start'
+                    onPress={() => setShowPicker(!showPicker)} 
+                    leftIcon={<Icon as={Ionicons} name='calendar' color='black' size='sm' ml={1}/>}
+                >
+                    <Input value={pickerState.value} {...props} isReadOnly variant='unstyled' height={9}/>
                 </Button>
                 {showPicker && (
                     <DateTimePicker 
@@ -49,9 +89,10 @@ const DatePicker = (props) => {
                         mode='date'
                         display='default'
                         onChange={handleDateChange}
+                        {...props}
                     />
                 )}
-                <FormControl.ErrorMessage>No puede estar vacío</FormControl.ErrorMessage>
+                <FormControl.ErrorMessage>The date is invalid</FormControl.ErrorMessage>
             </Stack>
         </FormControl>
     )
