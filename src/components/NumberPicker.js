@@ -26,7 +26,6 @@ const pickerReducer = (state,action) => {
 const NumberPicker = (props) => {
     const numbersOfItems = props.items || 10
     const arrayNumbers = React.useMemo(() => getArray(numbersOfItems), [numbersOfItems] )
-    const [pickedValue, setPickedValue] = React.useState(0)
 
     const [pickerState, pickerDispatch] = React.useReducer(pickerReducer, {
         value: '',

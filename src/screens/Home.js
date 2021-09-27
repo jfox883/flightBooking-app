@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dimensions, Pressable } from "react-native";
+import { Dimensions } from "react-native";
 import { NativeBaseProvider, Box, Center, Avatar, VStack, HStack, Button, Text } from "native-base";
 
 import { getItem } from "../utils/SecureStorage";

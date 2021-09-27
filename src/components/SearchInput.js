@@ -1,6 +1,9 @@
 import React from 'react'
 import { FormControl, Input, Stack, Icon } from "native-base";
+import { useSelector, useDispatch } from "react-redux";
 import { Ionicons } from "@expo/vector-icons";
+
+import { getLocations } from "../redux/actions/itineraries";
 
 const INPUT_CHANGE = 'INPUT_CHANGE'
 const INPUT_BLUR = 'INPUT_BLUR'
@@ -24,6 +27,7 @@ const inputReducer = (state, action) => {
 }
 
 const SearchInput = (props) => {
+    const dispatch = useDispatch()
     const [inputState, inputDispatch] = React.useReducer(inputReducer, {
         value: '',
         isValid: props.initialValid || false,
@@ -51,6 +55,12 @@ const SearchInput = (props) => {
 
     const handleBlurInput = () => inputDispatch({ type: INPUT_BLUR})
 
+    const handleKeyPress = ({ nativeEvent }) => {
+        if(inputState.value.length > 3) {
+            dispatch(getLocations({query: inputState.value}))
+        }
+    }
+
     return (
         <FormControl isRequired={props.isRequired} isInvalid={!inputState.isValid && inputState.touched}>
             <Stack>
@@ -59,6 +69,7 @@ const SearchInput = (props) => {
                     InputLeftElement={
                         <Icon as={Ionicons} name={props.iconName} size='sm' ml={1} />
                     }
+                    onKeyPress={handleKeyPress}
                     onChangeText={handleChangeText}
                     onBlur={handleBlurInput}
                     {...props}
