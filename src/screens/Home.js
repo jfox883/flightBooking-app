@@ -42,17 +42,17 @@ const formReducer = (state, action) => {
                 ...state.inputValues,
                 [action.input]: action.value,
             }
-            
+
             const updatedValidities = {
                 ...state.inputValidities,
                 [action.input]: action.isValid,
             }
-    
+
             let updatedFormIsValid = true
             for(const key in updatedValidities) {
                 updatedFormIsValid = updatedFormIsValid && updatedValidities[key]
             }
-    
+
             return {
                 formIsValid: updatedFormIsValid,
                 inputValidities: updatedValidities,
@@ -107,14 +107,14 @@ const Home = ({navigation}) => {
         <NativeBaseProvider key={resetView}>
             <Center flex={1} bg='white' safeArea>
                 <VStack space={4} width={width*0.9}>
-                    <SearchInput 
+                    <SearchInput
                         id='originPlace'
                         label='From where? '
                         iconName='home'
                         onInputChange={handleValueChange}
                         isRequired
                     />
-                    <SearchInput 
+                    <SearchInput
                         id='destinationPlace'
                         label='To where? '
                         iconName='airplane'
@@ -122,7 +122,7 @@ const Home = ({navigation}) => {
                         isRequired
                     />
                     <HStack space={1} width={width*0.45}>
-                        <DatePicker 
+                        <DatePicker
                             id='depart'
                             label='Depart Date '
                             onInputChange={handleValueChange}
@@ -136,31 +136,31 @@ const Home = ({navigation}) => {
                     </HStack>
                     <HStack space={2} alignItems='center'>
                         <VStack space={2} width={width*0.45}>
-                            <NumberPicker 
+                            <NumberPicker
                                 id='adults'
                                 placeHolder='Adults'
-                                items={8} 
+                                items={8}
                                 onInputChange={handleValueChange}
                                 isRequired
                             />
-                            <NumberPicker 
+                            <NumberPicker
                                 id='children'
                                 placeHolder='Children'
                                 onInputChange={handleValueChange}
                                 initialValid={true}
-                                items={8} 
+                                items={8}
                             />
                         </VStack>
                         <VStack space={2} width={width*0.45} alignItems='center'>
-                            <Button 
-                                height={60}     
-                                width={width*0.40} 
+                            <Button
+                                height={60}
+                                width={width*0.40}
                                 onPress={() => handleSearchPress()}
                                 isDisabled={!formState.formIsValid}
                             >
                                 Search
                             </Button>
-                            <Button 
+                            <Button
                                 height={45}
                                 width={width*0.30}
                                 colorScheme='danger'

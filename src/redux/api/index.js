@@ -1,9 +1,8 @@
 import axios from "axios"
 import { RAPIDAPI_HOST, RAPIDAPI_KEY } from "@env";
 
-export default (baseURL, method, url, data, headers) => 
+export default (method, url, data, headers) =>
     axios({
-        baseURL,
         method,
         url,
         data,
@@ -13,4 +12,3 @@ export default (baseURL, method, url, data, headers) =>
             ...headers
         }
     })
-
