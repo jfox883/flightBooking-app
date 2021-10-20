@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, FlatList, Text, Spinner, VStack, Pressable } from 'native-base'
+import { Box, FlatList, Text, Spinner, Pressable } from 'native-base'
 
 const FixedList = ({places, onItemPress}) => {
 
@@ -16,7 +16,7 @@ const FixedList = ({places, onItemPress}) => {
   if(!places) return <Spinner />
 
   return (
-    <Box position='absolute' height={250} top={78} width='100%' zIndex={1} bg='white'>
+    <Box position='absolute' height={250} top={78} width='100%' zIndex={1} bg='white' >
       <FlatList
         data={places}
         keyExtractor={item => item.PlaceId}

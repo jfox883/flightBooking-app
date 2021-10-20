@@ -1,6 +1,7 @@
 import React from 'react'
 import { Dimensions } from "react-native";
-import { NativeBaseProvider, Box, Center, Avatar, VStack, HStack, Button, Text } from "native-base";
+import { NativeBaseProvider, Box, Center, VStack, HStack, Button, Image } from "native-base";
+import moment from "moment";
 
 import { getItem } from "../utils/SecureStorage";
 
@@ -68,6 +69,9 @@ const Home = ({navigation}) => {
     const [formState, formDispatch] = React.useReducer(formReducer, INITIAL_STATE)
     const [resetView, setResetView] = React.useState(0)
 
+    const [departMinDate, setDepartMinDate] = React.useState(new Date())
+    const [returnMinDate, setReturnMinDate] = React.useState(new Date())
+
     React.useEffect(() => {
         (async () => {
             let userResult = await getItem('userInfo')
@@ -90,7 +94,13 @@ const Home = ({navigation}) => {
             headerRight: () => (
                 <NativeBaseProvider>
                     <Box flex={1} justifyContent='center' pr={3}>
-                        <Avatar size='sm' source={{uri: userData && userData.photoUrl}}/>
+                        <Image 
+                            size={10} 
+                            resizeMode={"contain"}
+                            borderRadius={20}
+                            source={{uri: userData && userData.photoUrl}}
+                            alt='Photo'
+                        />
                     </Box>
                 </NativeBaseProvider>
             )
@@ -98,7 +108,13 @@ const Home = ({navigation}) => {
     },[navigation, userData])
 
     const handleSearchPress = () => {
-        console.log(formState)
+        let values = formState.inputValues
+        navigation.navigate('Results', {
+            originPlace: values.originPlace.PlaceId,
+            destinationPlace: values.destinationPlace.PlaceId,
+            outboundDate: values.depart,
+            inboundDate: values.return,
+        })
     }
 
     const handleReset = () => setResetView(resetView => resetView+1)
@@ -126,12 +142,14 @@ const Home = ({navigation}) => {
                             id='depart'
                             label='Depart Date '
                             onInputChange={handleValueChange}
+                            minimumDate={departMinDate}
                             isRequired
                         />
                         <DatePicker
                             id='return'
                             label='Return Date'
                             onInputChange={handleValueChange}
+                            minimumDate={returnMinDate}
                         />
                     </HStack>
                     <HStack space={2} alignItems='center'>

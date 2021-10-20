@@ -51,6 +51,7 @@ const SearchInput = (props) => {
 
     const handleChangeInput = (place) => {
       let isValid = true
+      if(!place) isValid = false
 
       inputDispatch({
           type: INPUT_CHANGE,
@@ -62,7 +63,6 @@ const SearchInput = (props) => {
     const handleBlurInput = () => inputDispatch({ type: INPUT_BLUR})
 
     const handleKeyPress = ({ nativeEvent }) => {
-      console.log(text)
         if(text.length > 3) {
             dispatch(getLocations({query: text}))
             setShowFixedList(true)
@@ -71,7 +71,7 @@ const SearchInput = (props) => {
 
     const handlePlaceSelected = (place) => {
       handleChangeInput(place)
-      setText(place.PlaceName)
+      setText(`${place.PlaceName}, ${place.CountryName}`)
       setShowFixedList(false)
     }
 
@@ -91,7 +91,7 @@ const SearchInput = (props) => {
                 />
               <FormControl.ErrorMessage>It can't be empty</FormControl.ErrorMessage>
             </Stack>
-            {showFixedList && <FixedList places={places} onItemPress={handlePlaceSelected} />}
+            {showFixedList && <FixedList places={places} onItemPress={handlePlaceSelected}/>}
         </FormControl>
     )
 }

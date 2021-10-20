@@ -2,6 +2,7 @@ import React from 'react'
 import { FormControl, Input, Stack, Icon, Text, Button, HStack, Box, Spacer } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import moment from 'moment';
 
 const PICKER_CHANGE = 'PICKER_CHANGE'
 const PICKER_TOUCHED = 'PICKER_TOUCHED'
@@ -55,10 +56,10 @@ const DatePicker = (props) => {
         setShowPicker(!showPicker)
         if(event.type === 'set') {
             let isValid = true
-            let today = new Date()
+            let today = new Date().setHours(0,0,0,0)
             const currentDate = selectedDate || date
-            const pickedDateString = getStringDate(currentDate)
-            if(currentDate <= today) isValid = false
+            const pickedDateString = moment(currentDate).format('YYYY-MM-DD')
+            if(currentDate < today) isValid = false
             setDate(currentDate)
 
             pickerDispatch({
