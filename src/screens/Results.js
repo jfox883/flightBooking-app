@@ -15,6 +15,8 @@ const Results = ({route}) => {
         destinationPlace,
         outboundDate,
         inboundDate,
+        adults,
+        children
     } = route.params
 
     React.useEffect(() => {
@@ -24,6 +26,8 @@ const Results = ({route}) => {
                 destinationPlace,
                 outboundDate,
                 inboundDate,
+                adults,
+                children
             }))
             setHasFetched(true)
         }

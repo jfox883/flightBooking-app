@@ -1,7 +1,6 @@
 import React from 'react'
 import { Dimensions } from "react-native";
 import { NativeBaseProvider, Box, Center, VStack, HStack, Button, Image } from "native-base";
-import moment from "moment";
 
 import { getItem } from "../utils/SecureStorage";
 
@@ -114,6 +113,8 @@ const Home = ({navigation}) => {
             destinationPlace: values.destinationPlace.PlaceId,
             outboundDate: values.depart,
             inboundDate: values.return,
+            adults: values.adults,
+            children: values.children
         })
     }
 

@@ -13,6 +13,7 @@ from "@env";
 import { saveItem } from "../utils/SecureStorage";
 
 export default function Auth({navigation}) {
+    console.log(GOOGLE_ANDROID_CLIENT_ID)
 
     const handleLoginPress = async () => {
         try {

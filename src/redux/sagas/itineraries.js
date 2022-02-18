@@ -33,13 +33,40 @@ export function* getItineraries({ payload: {
     destinationPlace,
     outboundDate,
     inboundDate,
+    adults,
+    children
 }}) {
     try {
-        const url = `${baseURL}/browseroutes/v1.0/${country}/${currency}/${locale}/${originPlace}/${destinationPlace}/${outboundDate}/?inboundpartialdate=${inboundDate}`
-        const method = 'GET'
-
-        const results = yield call(apiCall, method, url)
-        yield put({ type: GET_ITINERARIES_SUCCESS, results: results.data })
+        const urlGetToken = `${baseURL}/pricing/v1.0/`
+        const method = 'POST'
+        const body = new URLSearchParams({
+            originPlace,
+            destinationPlace,
+            outboundDate,
+            inboundDate,
+            adults,
+            children,
+            country,
+            currency,
+            locale
+        })
+        const headers = {
+            'content-type': 'application/x-www-form-urlencoded' 
+        }
+        
+        const sessionKeyResult = yield call(apiCall, method, urlGetToken, body, headers)
+        const headerLocation = sessionKeyResult.headers.location
+        if(headerLocation) {
+            const sessionToken = headerLocation.substring(headerLocation.lastIndexOf('/')+1, headerLocation.length)
+            
+            const urlGetItineraries = `${baseURL}/pricing/uk2/v1.0/${sessionToken}?pageIndex=0&pageSize=20`
+            const method = 'GET'
+            const itineraries = yield call(apiCall, method, urlGetItineraries)
+            
+            (itineraries.data) 
+                ? yield put({ type: GET_ITINERARIES_SUCCESS, itineraries: itineraries.data})
+                : yield put({ type: GET_ITINERARIES_ERROR, error: 'No results found'})
+        }
     } catch (error) {
         yield put({ type: GET_ITINERARIES_ERROR, error })
     }

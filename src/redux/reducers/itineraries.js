@@ -16,9 +16,9 @@ export default function itineraries(state, action) {
         case GET_LOCATIONS_ERROR:
             return {...state, places: null, error: action.error}
         case GET_ITINERARIES_START:
-            return {...state}
+            return {...state, itineraries: null}
         case GET_ITINERARIES_SUCCESS:
-            return {...state, itineraries: action.results}
+            return {...state, itineraries: action.itineraries}
         case GET_ITINERARIES_ERROR:
             return {...state, itineraries: null, error: action.error}
         default:
